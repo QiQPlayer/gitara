@@ -1,10 +1,12 @@
+from cgitb import enable
+
 from ursina import *
 from ursina.color import rgba
 from ursina.lights import DirectionalLight
 import random
 
 app = Ursina()
-window.size = (2900, 1700)
+window.size = (1540, 900)
 #1540, 900 - laptop
 #2900, 1700 - pc
 Sky()
@@ -21,10 +23,12 @@ Begin = False
 
 score = 50
 popal = 0
-speed = 6
+speed = 5.25
 speed_not = 0
 high = 50
 nota_color_r = [color.green, color.yellow, color.red, color.blue]
+mode = 1
+speed_a = 0.995
 
 gitara = Entity(
         model="cube",
@@ -54,25 +58,25 @@ gitara3 = Entity(
 
 lin1 = Entity(
         model="cube",
-        color=color.rgb(0.85,0.85,0.85, 0.5),
+        color=color.rgba(0.85,0.85,0.85, 0.5),
         position=(1.5, 2.5, 5),
         scale=(0.3,0.3,80)
 )
 lin2 = Entity(
         model="cube",
-        color=color.rgb(0.85,0.85,0.85, 0.5),
+        color=color.rgba(0.85,0.85,0.85, 0.5),
         position=(4.5, 2.5, 5),
         scale=(0.3,0.3,80)
 )
 lin3 = Entity(
         model="cube",
-        color=color.rgb(0.85,0.85,0.85, 0.5),
+        color=color.rgba(0.85,0.85,0.85, 0.5),
         position=(-1.5, 2.5, 5),
         scale=(0.3,0.3,80)
 )
 lin4 = Entity(
         model="cube",
-        color=color.rgb(0.85,0.85,0.85, 0.5),
+        color=color.rgba(0.85,0.85,0.85, 0.5),
         position=(-4.5, 2.5, 5),
         scale=(0.3,0.3,80)
 )
@@ -108,44 +112,51 @@ gitara9 = Entity(
 )
 kop1 = Entity(
         model="cube",
-        color=color.rgb(0.1, 0.1, 1, 0.5),
+        color=color.rgba(0.1, 0.1, 1, 0.5),
         position=(-4.5, 2.5, -5),
         scale=(2,1,2),
         collider="box"
 )
 kop2 = Entity(
         model="cube",
-        color=color.rgb(0.1, 1, 0.1, 0.5),
+        color=color.rgba(0.1, 1, 0.1, 0.5),
         position=(-1.5, 2.5, -5),
         scale=(2,1,2),
         collider="box"
 )
 kop3 = Entity(
         model="cube",
-        color=color.rgb(1, 0.1, 0.1, 0.5),
+        color=color.rgba(1, 0.1, 0.1, 0.5),
         position=(1.5, 2.5, -5),
         scale=(2,1,2),
         collider="box"
 )
 kop4 = Entity(
         model="cube",
-        color=color.rgb(1, 1, 0.1, 0.5),
+        color=color.rgba(1, 1, 0.1, 0.5),
         position=(4.5, 2.5, -5),
         scale=(2,1,2),
         collider="box"
 )
 Score = Text(
-        text=f'score: {score}',
+        text=f'score: {score}   ',
         position=(-0.85, 0.23),
         scale=2,
         color=color.white,
         background=True
 )
+delet_note = Entity(
+        model="cube",
+        color=color.rgb(0.3,0.3,0.3),
+        position=(0, 2.5, -17),
+        collider="box",
+        scale=(12, 5, 5)
+)
 def spawn_nota(nota_color_r):
         global speed_not, speed, Begin
         if not Begin:
                 return
-        start.enabled = False
+        start_G.enabled = False
         nota_color = random.choice(nota_color_r)
         posi = 0
         if nota_color == color.blue:
@@ -175,17 +186,18 @@ def start_game():
     global Begin
     Begin = True
     spawn_nota(nota_color_r)
-start = Button(
+start_G = Button(
     text='Start Game',
-    color=color.rgb32(34, 139, 34, 200),
+    color=color.rgba32(34, 139, 34, 200),
     text_color=color.rgb32(0, 100, 0),
     scale=(0.5, 0.25),
     origin=(0, 0),
     text_size=2,
+    enabled=False,
     on_click=lambda: start_game()
                       )
 speed_text = Text(
-    text=f'speed: {0}',
+    text=f'speed: {0}  ',
     position=(-0.85, 0.4),
     scale=2,
     color=color.white,
@@ -200,85 +212,167 @@ game_over = Text(
     enabled=False
 )
 highscore = Text(
-        text=f'high score: {high}',
+        text=f'high score: {high}   ',
         position=(-0.85, 0.05),
         scale=2,
         color=color.yellow,
         background=True,
 )
+Mode = Text(
+        text=f'mode: normal',
+        position=(-0.85, -0.125),
+        scale=2,
+        color=color.yellow,
+        background=True,
+)
+def select_easy():
+    global Mode, kop1, kop2, kop3, kop4, mode, speed, speed_a
+    start_G.enabled = True
+    Mode_easy.enabled = False
+    Mode_normal.enabled = False
+    Mode_hard.enabled = False
+    Mode.text = "mode: easy"
+    Mode.color = color.green
+    kop1.scale = (2, 1, 3)
+    kop2.scale = (2, 1, 3)
+    kop3.scale = (2, 1, 3)
+    kop4.scale = (2, 1, 3)
+    mode = 0.5
+    speed = 6
+    speed_a = 0.998
+def select_normal():
+    global Mode
+    start_G.enabled = True
+    Mode_easy.enabled = False
+    Mode_normal.enabled = False
+    Mode_hard.enabled = False
+    Mode.text = "mode: normal"
+    Mode.color = color.yellow
+def select_hard():
+    global Mode, kop1, kop2, kop3, kop4, mode, speed, speed_a
+    start_G.enabled = True
+    Mode_easy.enabled = False
+    Mode_normal.enabled = False
+    Mode_hard.enabled = False
+    Mode.text = "mode: hard"
+    Mode.color = color.red
+    kop1.scale = (2, 1, 1)
+    kop2.scale = (2, 1, 1)
+    kop3.scale = (2, 1, 1)
+    kop4.scale = (2, 1, 1)
+    mode = 2
+    speed = 4.5
+    speed_a = 0.992
+Mode_easy = Button(
+    text='Easy',
+    color=color.rgba32(34, 139, 34, 200),
+    text_color=color.rgb32(0, 100, 0),
+    scale=(0.5, 0.25),
+    origin=(0, -1.25),
+    enabled=True,
+    text_size=2,
+    on_click=select_easy
+)
+Mode_normal = Button(
+    text='Normal',
+    color=color.rgba32(139, 139, 34, 200),
+    text_color=color.rgb32(100, 100, 0),
+    scale=(0.5, 0.25),
+    origin=(0, 0),
+    enabled=True,
+    text_size=2,
+    on_click=select_normal
+)
+Mode_hard = Button(
+    text='Hard',
+    color=color.rgba32(139, 34, 34, 200),
+    text_color=color.rgb32(100, 0, 0),
+    scale=(0.5, 0.25),
+    origin=(0, 1.25),
+    enabled=True,
+    text_size=2,
+    on_click=select_hard
+)
 target = 0
+
 def input(key):
         global target, Begin, popal
         if key == 'a':
                 target = kop1.intersects()
                 if target.hit:
-                        kop1.color = color.rgb(0.1, 0.1, 1, 1)
-                        kop1.animate_color(color.rgb(0.1, 0.1, 1, 0.5), duration=0.05, delay=0.1)
+                        kop1.color = color.rgba(0.1, 0.1, 1, 1)
+                        kop1.animate_color(color.rgba(0.1, 0.1, 1, 0.5), duration=0.05, delay=0.1)
                         target.entity.animate_scale(0, duration=0.2, curve=curve.linear)
                         destroy(target.entity, delay=0.2)
                         popal += 1
                         target.entity.collider = None
                 elif Begin:
-                        kop1.color = color.rgb(0.5, 0.5, 0.5, 1)
-                        kop1.animate_color(color.rgb(0.1, 0.1, 1, 0.5), duration=0.05, delay=0.1)
+                        kop1.color = color.rgba(0.5, 0.5, 0.5, 1)
+                        kop1.animate_color(color.rgba(0.1, 0.1, 1, 0.5), duration=0.05, delay=0.1)
                         popal -= 1
         elif key == 's':
                 target = kop2.intersects()
                 if target.hit:
-                        kop2.color = color.rgb(0.1, 1, 0.1, 1)
-                        kop2.animate_color(color.rgb(0.1, 1, 0.1, 0.5), duration=0.1, delay=0.1)
+                        kop2.color = color.rgba(0.1, 1, 0.1, 1)
+                        kop2.animate_color(color.rgba(0.1, 1, 0.1, 0.5), duration=0.1, delay=0.1)
                         target.entity.animate_scale(0, duration=0.2, curve=curve.linear)
                         destroy(target.entity, delay=0.2)
                         popal += 1
                         target.entity.collider = None
                 elif Begin:
-                        kop2.color = color.rgb(0.5, 0.5, 0.5, 1)
-                        kop2.animate_color(color.rgb(0.1, 1, 0.1, 0.5), duration=0.1, delay=0.1)
+                        kop2.color = color.rgba(0.5, 0.5, 0.5, 1)
+                        kop2.animate_color(color.rgba(0.1, 1, 0.1, 0.5), duration=0.1, delay=0.1)
                         popal -= 1
         elif key == 'd':
                 target = kop3.intersects()
                 if target.hit:
-                        kop3.color = color.rgb(1, 0.1, 0.1, 1)
-                        kop3.animate_color(color.rgb(1, 0.1, 0.1, 0.5), duration=0.1, delay=0.1)
+                        kop3.color = color.rgba(1, 0.1, 0.1, 1)
+                        kop3.animate_color(color.rgba(1, 0.1, 0.1, 0.5), duration=0.1, delay=0.1)
                         target.entity.animate_scale(0, duration=0.2, curve=curve.linear)
                         destroy(target.entity, delay=0.2)
                         popal += 1
                         target.entity.collider = None
                 elif Begin:
-                        kop3.color = color.rgb(0.5, 0.5, 0.5, 1)
-                        kop3.animate_color(color.rgb(1, 0.1, 0.1, 0.5), duration=0.1, delay=0.1)
+                        kop3.color = color.rgba(0.5, 0.5, 0.5, 1)
+                        kop3.animate_color(color.rgba(1, 0.1, 0.1, 0.5), duration=0.1, delay=0.1)
                         popal -= 1
         elif key == 'f':
                 target = kop4.intersects()
                 if target.hit:
-                        kop4.color = color.rgb(1, 1, 0.1, 1)
-                        kop4.animate_color(color.rgb(1, 1, 0.1, 0.5), duration=0.1, delay=0.1)
+                        kop4.color = color.rgba(1, 1, 0.1, 1)
+                        kop4.animate_color(color.rgba(1, 1, 0.1, 0.5), duration=0.1, delay=0.1)
                         target.entity.animate_scale(0, duration=0.2, curve=curve.linear)
                         destroy(target.entity, delay=0.2)
                         popal += 1
                         target.entity.collider = None
                 elif Begin:
-                        kop4.color = color.rgb(0.5, 0.5, 0.5, 1)
-                        kop4.animate_color(color.rgb(1, 1, 0.1, 0.5), duration=0.1, delay=0.1)
+                        kop4.color = color.rgba(0.5, 0.5, 0.5, 1)
+                        kop4.animate_color(color.rgba(1, 1, 0.1, 0.5), duration=0.1, delay=0.1)
                         popal -= 1
 def update():
-        global speed, speed_not, popal, score, Score, game_over, Begin, highscore, high
+        global speed, speed_not, popal, score, Score, game_over, Begin, highscore, high, target, delet_note, mode, speed_a
+        target = delet_note.intersects()
+        if target.hit:
+            destroy(target.entity, delay=0.01)
+            popal -= 1
         if speed_not == 1:
-                speed = speed * 0.999
+                speed = speed * speed_a
                 speed_not = 0
+        if popal > 1 or popal < -1:
+            popal = 0
         if popal == 1:
                 popal = 0
                 score += 10
-                Score.text = f'score: {score}'
+                Score.text = f'score: {int(score)}'
                 if high < score:
-                        high = score
+                        high = int(score)
                         highscore.text = f'high score: {high}'
         elif popal == -1:
                 popal = 0
-                score -= 10
-                Score.text = f'score: {score}'
+                score -= 10 * mode
+                Score.text = f'score: {int(score)}'
                 if high < score:
-                        high = score
+                        high = int(score)
                         highscore.text = f'high score: {high}'
         if score <= 0 and Begin:
                 game_over.enabled = True
