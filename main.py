@@ -18,12 +18,14 @@ camera.fov = 70
 light = DirectionalLight()
 light.look_at(Vec3(2, -4, 1))
 
-mi = Audio('mi.mp3', autoplay=False, volume=0.7)
-do = Audio('do.mp3', autoplay=False, volume=0.7)
-si = Audio('si.mp3', autoplay=False, volume=0.7)
-sol = Audio('sol.mp3', autoplay=False, volume=0.7)
-err = Audio('err.mp3', autoplay=False, volume=0.7)
+mi = Audio('mi.mp3', autoplay=False, volume=0.8)
+do = Audio('do.mp3', autoplay=False, volume=0.8)
+si = Audio('si.mp3', autoplay=False, volume=0.8)
+sol = Audio('sol.mp3', autoplay=False, volume=0.8)
+err = Audio('err.mp3', autoplay=False, volume=0.8)
 su = Audio('su.mp3', autoplay=False, volume=3)
+fon = Audio('fon.mp3', autoplay=False, loop=True, volume=0.5)
+over = Audio('over.mp3', autoplay=False, volume=0.8)
 
 Begin = False
 score = 50
@@ -313,6 +315,7 @@ def start_game():
     Begin = True
     spawn_nota(nota_color_r)
     su.play()
+    fon.play()
 
 start_G = Button(
     text='Start Game',
@@ -473,8 +476,10 @@ def update():
         target_G = delet_note_g.intersects()
         if score < 0:
             score = 0
-        if score == 0 and Begin:
+        if score <= 0 and Begin:
                 game_over.enabled = True
+                fon.stop()
+                over.play()
                 Begin = False
                 delet_note_g.animate_z(60, duration=0.5, curve=curve.linear,loop=False)
 
